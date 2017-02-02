@@ -4,7 +4,6 @@
     {
         string NamePlayer { get; }
         string NameNPC { get; }
-        int MoneyPlayer { get; set; }
-        int MoneyNPC { get; set; }        
+        int MoneyPlayer { get; set; }             
     }
 }

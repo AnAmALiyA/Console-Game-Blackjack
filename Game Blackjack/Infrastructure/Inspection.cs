@@ -13,8 +13,8 @@ namespace Game_Blackjack.Infrastructure
             this.dictTextByGame = dictTextByGame;
         }
 
-        private const string patternMoney = @"[0-9]";
-        private const string patternName = @"[a-zA-Zа-яА-Я]";
+        private const string patternMoney = @"^[0-9]+$";
+        private const string patternName = @"^[a-zA-Zа-яА-Я]+$";
         bool success;
 
         private Regex regexName = new Regex(patternName);
@@ -25,20 +25,22 @@ namespace Game_Blackjack.Infrastructure
             Console.WriteLine(dictTextByGame["enterName"]);
             try
             {
+                string temp = string.Empty;
                 success = false;
                 do
                 {
-                    success = regexName.IsMatch(Console.ReadLine());
+                    temp = Console.ReadLine();
+                    success = regexName.IsMatch(temp);
                     if (success)
                     {
-                        return Console.ReadLine();
+                        return temp;
                     }
                     else
                     {
                         Console.WriteLine("\n" + dictTextByGame["erroName"] + "\n");
                         Console.WriteLine(dictTextByGame["enterName"]);
                     }
-                } while (!success);   //while (!success && Console.ReadKey().Key != ConsoleKey.Escape);
+                } while (!success);
             }
             catch (Exception ex)
             {
@@ -52,13 +54,25 @@ namespace Game_Blackjack.Infrastructure
             Console.Write(dictTextByGame["enterMoney"]);
             try
             {
+                string temp = string.Empty;
                 success = false;
                 do
-                {                    
-                    success = regexMoney.IsMatch(Console.ReadLine());
-                    if (success & Int32.Parse(Console.ReadLine()) > 5)
+                {
+                    temp = Console.ReadLine();
+                    success = regexMoney.IsMatch(temp);
+                    if (success)
                     {
-                        return Int32.Parse(Console.ReadLine());                       
+                        if (Int32.Parse(temp) > 5)
+                        {
+                            Console.Clear();
+                            return Int32.Parse(temp);
+                        }
+                        else
+                        {
+                            success = false;
+                            Console.WriteLine("\n" + dictTextByGame["erroNumber"] + "\n");
+                            Console.WriteLine(dictTextByGame["enterMoney"]);
+                        }                                           
                     }
                     else
                     {

@@ -8,16 +8,6 @@ namespace Game_Blackjack
 {
     class GameBlackjack
     {
-        private static void PreView(string screen)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t" + screen);
-            Console.ForegroundColor = ConsoleColor.White;
-
-            Thread.Sleep(5000);
-            Console.Clear();
-        }
-
         static void Main(string[] args)
         {
             string name = null;
@@ -25,10 +15,17 @@ namespace Game_Blackjack
 
             SpecificationGame spec = new SpecificationGame();
             IInspection insp = new Inspection(spec.dictTextByGame);
+            View view = new View();
 
             Console.Title = spec.dictTextByGame["nameGame"];
-            PreView(spec.dictTextByGame["nameGame"]);
-            
+            view.PreView(spec.dictTextByGame["nameGame"]);
+
+            Console.WriteLine(spec.dictTextByGame["seeRules"]);
+            if (Console.ReadKey().Key == ConsoleKey.F1)
+            {
+                view.ShowRules(spec.dictTextByGame);
+            }
+            Console.Clear();
             Console.WriteLine(spec.dictTextByGame["info"]+"\n");            
 
             name = insp.ExamineEnterName();
@@ -38,7 +35,7 @@ namespace Game_Blackjack
             if (!(name == null && money == -1))
             {
                 IDataGame data = new DataGame(name, money);
-                IBusinessLogicGame busin = new BusinessLogicGame(data, spec.dictTextByGame);
+                IBusinessLogicGame busin = new BusinessLogicGame(data, spec.dictTextByGame, view);
                 busin.Start();
             }
             else

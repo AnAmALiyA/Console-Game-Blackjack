@@ -4,20 +4,15 @@ namespace Game_Blackjack.Infrastructure
 {
     public class DataGame : IDataGame
     {
-        private string name, npc;
-        private int moneyPlayer, moneyNPC;
-
         public DataGame(string name, int money)
         {
-            this.name = name;
+            this.NamePlayer = name;
             this.NameNPC = "NPC";
-            this.moneyPlayer = money;
-            this.moneyNPC = money;
+            this.MoneyPlayer = money;            
         }
 
-        public string NamePlayer { get; }
-        public string NameNPC { get; }
-        public int MoneyPlayer { get; set; }
-        public int MoneyNPC { get; set; }
+        public string NamePlayer { get; set; }
+        public string NameNPC { get; set; }
+        public int MoneyPlayer { get; set; }        
     }
 }
