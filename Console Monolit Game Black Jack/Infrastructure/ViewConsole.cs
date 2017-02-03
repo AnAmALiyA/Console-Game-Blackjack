@@ -13,17 +13,17 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             dictTextByGame.Add("info", "Enter your Name and the amount of money that you want to have for this game.");
             dictTextByGame.Add("enterName", "Please enter your Name here: ");
             dictTextByGame.Add("enterMoney", "Please enter the amount of money that you want to have for this game(It must be an integer and at least 100 and not more than 400): ");
-            dictTextByGame.Add("continueGame", "Please press any key to continue.");
+            dictTextByGame.Add("continueGame", "Please press key \"y\" to continue game.");
 
-            dictTextByGame.Add("erroName", "\nYou have entered the incorrect name. Make sure that it is made up of characters.\n");
-            dictTextByGame.Add("erroNumber", "\nYou have entered the wrong number. Make sure that it is a positive integer and at least 100 and not more than 400)\n");
-            dictTextByGame.Add("erroFields", "The fields have empty values.");
-            dictTextByGame.Add("erroBet", "\nYou have entered an incorrect rate. Try it again.");
-            dictTextByGame.Add("erroBetMoney", "\nYou do not have the money to bet. Try it again.");
+            dictTextByGame.Add("errorName", "\nYou have entered the incorrect name. Make sure that it is made up of characters.\n");
+            dictTextByGame.Add("errorNumber", "\nYou have entered the wrong number. Make sure that it is a positive integer and at least 100 and not more than 400)\n");
+            dictTextByGame.Add("errorFields", "The fields have empty values.");
+            dictTextByGame.Add("errorBet", "\nYou have entered an incorrect rate. Try it again.");
+            dictTextByGame.Add("errorBetMoney", "\nYou do not have the money to bet. Try it again.");
             dictTextByGame.Add("errorNotEnoughMoney", "\nYou do not have the money. You LOST.");
-            dictTextByGame.Add("erroSplit", "With these cards you can not use split.");
-            dictTextByGame.Add("erroRepeatBet", "You can not repeat rate.");
-            dictTextByGame.Add("erroDouble", "You can not double down.");
+            dictTextByGame.Add("errorSplit", "With these cards you can not use split.");
+            dictTextByGame.Add("errorepeatBet", "You can not repeat rate.");
+            dictTextByGame.Add("errorDouble", "You can not double down.");
 
             dictTextByGame.Add("didBet", "\nBet: {0}\n\n");
             dictTextByGame.Add("nameMoneyUser", "{0}\t\t\t\t\tSum: {1}\n");
@@ -106,9 +106,9 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void ErrorSplit()
+        public static void errorSplit()
         {
-            Console.WriteLine(dictTextByGame["erroSplit"]);
+            Console.WriteLine(dictTextByGame["errorSplit"]);
         }
 
         public static void Title()
@@ -136,7 +136,7 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
 
         public static void ErrorMoney()
         {
-            Console.WriteLine(dictTextByGame["erroNumber"]);
+            Console.WriteLine(dictTextByGame["errorNumber"]);
         }
 
         public static void EnterAmountOfMoney()
@@ -151,7 +151,7 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
 
         public static void ErrorName()
         {
-            Console.WriteLine(dictTextByGame["erroName"]);            
+            Console.WriteLine(dictTextByGame["errorName"]);            
         }
 
         public static void Error(string text)
@@ -164,19 +164,52 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             Console.Clear();
         }
 
-        public static void MainView(ConsoleColor color, string nameUser, int pointsCards, string namesCards, int money = 0)
+        public static string ReadKey()
+        {
+            return Console.ReadKey().Key.ToString();
+        }
+
+        public static string ReadLine()
+        {
+            return Console.ReadLine();
+        }
+
+        public static string RowNamesCards(string[] nameCard, string[] suitCard)
+        {
+            string tempStr = string.Empty;
+            if (nameCard.Length == suitCard.Length)
+            {
+                for (int i = 0; i < nameCard.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        tempStr += nameCard[i] + "-" + suitCard[i];
+                    }
+                    else
+                    {
+                        tempStr += ", " + nameCard[i] + "-" + suitCard[i];
+                    }
+                }
+            }
+            return tempStr;
+        }
+
+        public static void MainView(string nameUser, int pointsCards, string namesCards, int money = 0)
         {
             Console.WriteLine(new string('-', 70));
-            Console.ForegroundColor = color;
-            if (money == 0)
+            
+            if (nameUser == "NPC")
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(dictTextByGame["nameMoneyNPC"], nameUser);
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(dictTextByGame["nameMoneyUser"], nameUser, money);
             }
             Console.ForegroundColor = ConsoleColor.White;
+
             if (namesCards == null)
             {
                 Console.WriteLine(dictTextByGame["pointsCards"], pointsCards, "none");
@@ -200,14 +233,14 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             Console.WriteLine(dictTextByGame["putAbet"]);
         }
 
-        public static void ErroBet()
+        public static void ErrorBet()
         {
-            Console.WriteLine(dictTextByGame["erroBet"]);
+            Console.WriteLine(dictTextByGame["errorBet"]);
         }
 
-        public static void ErroBetMoney()
+        public static void ErrorBetMoney()
         {
-            Console.WriteLine(dictTextByGame["erroBetMoney"]);
+            Console.WriteLine(dictTextByGame["errorBetMoney"]);
         }
 
         public static void ErrorNotEnoughMoney()
@@ -257,7 +290,6 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             Console.WriteLine(dictTextByGame["numberGame"], numberGame);
         }
 
-
         public static void ReportGame(string nameUser, int money, int winLost, int bet, int points, string cards)
         {
             Console.WriteLine();
@@ -294,7 +326,7 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             Console.WriteLine(dictTextByGame["continueGame"]);
         }
 
-        public static void LineConsole()
+        public static void LineInConsole()
         {
             Console.WriteLine(new string('-', 70));
         }

@@ -49,7 +49,7 @@
     <Compile Include="Entities\ReportGame.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Infrastructure\BusinessLogic.cs" />
-    <Compile Include="Infrastructure\Inspection.cs" />
+    <Compile Include="Infrastructure\Validation.cs" />
     <Compile Include="Infrastructure\ViewConsole.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

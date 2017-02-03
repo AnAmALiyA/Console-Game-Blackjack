@@ -14,7 +14,7 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
 
             game.CreateUser();
            
-            game.ExecuteFiveGames();
+            game.ExecuteGames();
 
             game.ShowAllReport();
         }

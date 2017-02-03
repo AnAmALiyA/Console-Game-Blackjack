@@ -9,11 +9,11 @@ namespace Console_Monolit_Game_Black_Jack.Entities
     public class Game
     {
         CardDeck CardDeck { get; set; }
-        Inspection Inspect { get; set; }
+        Validation Validation { get; set; }
         List<ReportGame> ListReportGame { get; set; }
         public List<User> UserGame { get; set; }
+        int NumberCurrentGame { get; set; }
         int Bet { get; set; }
-        ConsoleColor[] Color { get; set; }
 
         bool ExitGame { get; set; }
         bool FinishCoursePlayer { get; set; }
@@ -23,12 +23,11 @@ namespace Console_Monolit_Game_Black_Jack.Entities
 
         enum RestrictionsEnum
         {
+            Lost = -1,
+            Draw,
+            Win,
+            TowCards,
             NoValues = 0,
-            Win = 1,
-            Draw = 0,
-            Lost =-1,
-            TowCards = 2,
-            ExecuteFiveGames = 5,
             LimitForTakingNextCardNPC = 17,
             LimitPointForWin = 21,
             Bet5 = 5,
@@ -41,11 +40,10 @@ namespace Console_Monolit_Game_Black_Jack.Entities
         public Game()
         {
             this.CardDeck = new CardDeck();
-            this.Inspect = new Inspection();
+            this.Validation = new Validation();
             this.ListReportGame = new List<ReportGame>();
             this.UserGame = new List<User>();
-            UserGame.Add(new User { Name = "NPC" });            
-            this.Color = new ConsoleColor[] { ConsoleColor.Green, ConsoleColor.Yellow };            
+            UserGame.Add(new User { Name = "NPC" });       
         }
 
         public void Screen()
@@ -59,7 +57,7 @@ namespace Console_Monolit_Game_Black_Jack.Entities
         {
             ViewConsole.Clear();
             ViewConsole.AskSeeRules();
-            if (Console.ReadKey().Key == ConsoleKey.F1)
+            if (ViewConsole.ReadKey() == "F1")
             {
                 ViewConsole.ShowRules();
             }
@@ -71,13 +69,23 @@ namespace Console_Monolit_Game_Black_Jack.Entities
 
             ViewConsole.Clear();
             ViewConsole.EnterName();
-            Inspect.ExamineEnterName(player);
+            Validation.ExamineEnterName(player);
 
             ViewConsole.Clear();
             ViewConsole.EnterAmountOfMoney();
-            Inspect.ExamineEnterMoney(player);
+            Validation.ExamineEnterMoney(player);
 
             UserGame.Add(player);
+        }
+        
+        public int SumPointsCards(User user)
+        {
+            int tempSum = 0;
+            for (int i = 0; i < user.Cards.Count; i++)
+            {
+                tempSum += user.Cards[i].ValueCard;
+            }
+            return tempSum;
         }
 
         public void ViewDataUser()
@@ -92,27 +100,27 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                     {
                         if (user.Name == "NPC")
                         {
-                            ViewConsole.MainView(ConsoleColor.Green, user.Name, (int)RestrictionsEnum.NoValues, null);
+                            ViewConsole.MainView(user.Name, (int)RestrictionsEnum.NoValues, null);
                         }
-                        else if(user.Money!=0)   
+                        else if (user.Money != 0)
                         {
-                            ViewConsole.MainView(ConsoleColor.Yellow, user.Name, (int)RestrictionsEnum.NoValues, null, user.Money);
+                            ViewConsole.MainView(user.Name, (int)RestrictionsEnum.NoValues, null, user.Money);
                         }
                         else
                         {
-                            ViewConsole.MainView(ConsoleColor.Yellow, user.Name, (int)RestrictionsEnum.NoValues, null);
+                            ViewConsole.MainView(user.Name, (int)RestrictionsEnum.NoValues, null);
                         }
                     }
                     else
                     {
                         if (user.Name == "NPC")
                         {
-                            ViewConsole.MainView(ConsoleColor.Green, user.Name, user.Cards[0].ValueCard, user.Cards[0].NameCard + "-" + user.Cards[0].SuitCard + @", [Hidden cards.]");
+                            ViewConsole.MainView(user.Name, user.Cards[0].ValueCard, user.Cards[0].NameCard + "-" + user.Cards[0].SuitCard + @", [Hidden cards.]");
 
                         }
                         else
                         {
-                            ViewConsole.MainView(ConsoleColor.Yellow, user.Name, user.SumPointsCards(), user.RowNamesCards(), user.Money);
+                            ViewConsole.MainView(user.Name, SumPointsCards(user), ViewConsole.RowNamesCards(GetArrayNameCards(user), GetArraySuitCards(user)), user.Money);
                         }
                     }
             }
@@ -123,12 +131,32 @@ namespace Console_Monolit_Game_Black_Jack.Entities
             }
         }
 
+        private string[] GetArraySuitCards(User user)
+        {
+            string[] tempList = new string[user.Cards.Count];
+            for (int i = 0; i < user.Cards.Count; i++)
+            {
+                tempList[i] = user.Cards[i].SuitCard;
+            }
+            return tempList;
+        }
+
+        string[] GetArrayNameCards(User user)
+        {
+            string[] tempList = new string[user.Cards.Count];
+            for (int i = 0; i < user.Cards.Count; i++)
+            {
+                tempList[i] = user.Cards[i].NameCard;
+            }
+            return tempList;
+        }
+
         public void GetBetUser(User user)
         {
             if ((user.Money - (int)RestrictionsEnum.Bet5) < 0)
             {
                 ViewConsole.ErrorNotEnoughMoney();
-                Console.ReadKey();
+                ViewConsole.ReadKey();
                 Environment.Exit(0);
             }
             else
@@ -140,7 +168,7 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                 do
                 {
                     int temp = 0;
-                    string tempStr = Console.ReadLine();
+                    string tempStr = ViewConsole.ReadLine();
                     if (regex.IsMatch(tempStr))
                     {
                         temp = Int32.Parse(tempStr);
@@ -150,13 +178,13 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                         }
                         else
                         {
-                            ViewConsole.ErroBet();
+                            ViewConsole.ErrorBet();
                         }
                     }
 
                     if (user.Money - Bet < 0)
                     {
-                        ViewConsole.ErroBetMoney();
+                        ViewConsole.ErrorBetMoney();
                     }
                 } while (Bet == 0 | (user.Money - Bet < 0));
 
@@ -185,13 +213,12 @@ namespace Console_Monolit_Game_Black_Jack.Entities
 
         public void GetCard(User user)
         {
-            user.Cards.Add(CardDeck.listCards[0]);
-            CardDeck.listCards.RemoveAt(0);
+            user.Cards.Add(CardDeck.ListCards[0]);
+            CardDeck.ListCards.RemoveAt(0);
         }
 
         public void GetGame()
         {
-            ReportGame report = new ReportGame();
             do
             {
                 if (NextCourseComputer)
@@ -215,22 +242,22 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                 {
                     ViewConsole.GiveCard();
 
-                    switch (Console.ReadKey().Key)
+                    switch (ViewConsole.ReadKey())
                     {
-                        case ConsoleKey.F1:
+                        case "F1":
                             ViewConsole.ShowRules();
                             NextCourseComputer = false;
                             break;
 
-                        case ConsoleKey.F2:
+                        case "F2":
                             PlayerCourse();
                             break;
 
-                        case ConsoleKey.F3:
+                        case "F3":
                             FinishCoursePlayer = true;
                             break;
 
-                        case ConsoleKey.F4:
+                        case "F4":
                             if (UserGame[1].Cards.Count == (int)RestrictionsEnum.TowCards & UserGame[1].Cards[0].NameCard == UserGame[1].Cards[1].NameCard)
                             {
                                 if (GetRepeatBet(UserGame[1]))
@@ -245,12 +272,12 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                             }
                             else
                             {
-                                ViewConsole.ErrorSplit();
+                                ViewConsole.errorSplit();
                                 NextCourseComputer = false;
                             }                           
                             break;
 
-                        case ConsoleKey.F5:
+                        case "F5":
                             if (!RepeatBet)
                             {
                                 if (!GetRepeatBet(UserGame[1]))
@@ -262,7 +289,7 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                             }
                             break;
 
-                        case ConsoleKey.F6:
+                        case "F6":
                             if (UserGame[1].Cards.Count==(int)RestrictionsEnum.TowCards)
                             {
                                 if (GetRepeatBet(UserGame[1]))
@@ -278,7 +305,7 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                             }
                             break;
 
-                        case ConsoleKey.F7:
+                        case "F7":
                             ExitGame = true;
                             break;
                         default:
@@ -302,7 +329,7 @@ namespace Console_Monolit_Game_Black_Jack.Entities
 
         void ComputerCourse()
         {
-            if (UserGame[0].SumPointsCards() <= (int)RestrictionsEnum.LimitForTakingNextCardNPC)
+            if (SumPointsCards(UserGame[0]) <= (int)RestrictionsEnum.LimitForTakingNextCardNPC)
             {
                 GetCard(UserGame[0]);
             }
@@ -316,58 +343,79 @@ namespace Console_Monolit_Game_Black_Jack.Entities
 
         void AnalysisRuond()
         {
-            if (UserGame[1].SumPointsCards() > (int)RestrictionsEnum.LimitPointForWin)
+            if (SumPointsCards(UserGame[1]) > (int)RestrictionsEnum.LimitPointForWin)
             {
                 ViewConsole.End((int)RestrictionsEnum.Lost);
-                UserGame[1].WinLost = (int)RestrictionsEnum.Lost;
+                UserGame[1].WinDrawLost = (int)RestrictionsEnum.Lost;                
                 ExitGame = true;
             }
 
-            if (UserGame[0].SumPointsCards() > (int)RestrictionsEnum.LimitPointForWin)
+            if (SumPointsCards(UserGame[0]) > (int)RestrictionsEnum.LimitPointForWin)
             {
                 ViewConsole.End((int)RestrictionsEnum.Win);
-                UserGame[1].WinLost = (int)RestrictionsEnum.Win;
+                UserGame[1].WinDrawLost = (int)RestrictionsEnum.Win;
+                UserGame[1].Money += UserGame[1].Bet*2;
                 ExitGame = true;
             }
 
             if (!ExitGame & FinishCourseComputer & FinishCoursePlayer)
             {
-                if (UserGame[0].SumPointsCards() == (int)RestrictionsEnum.LimitPointForWin & UserGame[1].SumPointsCards() == (int)RestrictionsEnum.LimitPointForWin)
+                if (SumPointsCards(UserGame[0]) == (int)RestrictionsEnum.LimitPointForWin & SumPointsCards(UserGame[1]) == (int)RestrictionsEnum.LimitPointForWin)
                 {
                     if (UserGame[0].Cards.Count==(int)RestrictionsEnum.TowCards & UserGame[1].Cards.Count == (int)RestrictionsEnum.TowCards)
                     {
                         ViewConsole.End((int)RestrictionsEnum.Draw);
-                        UserGame[1].WinLost = (int)RestrictionsEnum.Draw;
+                        UserGame[1].WinDrawLost = (int)RestrictionsEnum.Draw;
+                        UserGame[1].Money += UserGame[1].Bet;
                     }
                     else if (UserGame[0].Cards.Count == (int)RestrictionsEnum.TowCards)
                     {
                         ViewConsole.End((int)RestrictionsEnum.Lost);
-                        UserGame[1].WinLost = (int)RestrictionsEnum.Lost;
+                        UserGame[1].WinDrawLost = (int)RestrictionsEnum.Lost;
                     }
                     else if (UserGame[1].Cards.Count == (int)RestrictionsEnum.TowCards)
                     {
                         ViewConsole.End((int)RestrictionsEnum.Win);
-                        UserGame[1].WinLost = (int)RestrictionsEnum.Win;
+                        UserGame[1].WinDrawLost = (int)RestrictionsEnum.Win;
+                        UserGame[1].Money += UserGame[1].Bet * 2;
                     }
                     else
                     {
                         ViewConsole.End((int)RestrictionsEnum.Draw);
-                        UserGame[1].WinLost = (int)RestrictionsEnum.Draw;
+                        UserGame[1].WinDrawLost = (int)RestrictionsEnum.Draw;
+                        UserGame[1].Money += UserGame[1].Bet;
                     }
                     ExitGame = true;
                 }
 
                 if (!ExitGame)
                 {
-                    if (UserGame[0].SumPointsCards()>UserGame[1].SumPointsCards())
+                    if (SumPointsCards(UserGame[0]) == SumPointsCards(UserGame[1]))
+                    {
+                        ViewConsole.End((int)RestrictionsEnum.Draw);
+                        UserGame[1].WinDrawLost = (int)RestrictionsEnum.Draw;
+                        UserGame[1].Money += UserGame[1].Bet;
+                    }
+                    else if (SumPointsCards(UserGame[0]) > SumPointsCards(UserGame[1]))
                     {
                         ViewConsole.End((int)RestrictionsEnum.Lost);
-                        UserGame[1].WinLost = (int)RestrictionsEnum.Lost;
+                        UserGame[1].WinDrawLost = (int)RestrictionsEnum.Lost;
                     }
                     else
                     {
-                        ViewConsole.End((int)RestrictionsEnum.Win);
-                        UserGame[1].WinLost = (int)RestrictionsEnum.Win;
+                        if (SumPointsCards(UserGame[1]) == (int)RestrictionsEnum.LimitPointForWin)
+                        {
+                            ViewConsole.End((int)RestrictionsEnum.Win);
+                            UserGame[1].WinDrawLost = (int)RestrictionsEnum.Win;
+                            double temp = UserGame[1].Bet * 1.5;
+                            UserGame[1].Money += (int)temp;
+                        }
+                        else
+                        {
+                            ViewConsole.End((int)RestrictionsEnum.Win);
+                            UserGame[1].WinDrawLost = (int)RestrictionsEnum.Win;
+                            UserGame[1].Money += UserGame[1].Bet * 2;
+                        }
                     }
                     ExitGame = true;
                 }
@@ -406,31 +454,32 @@ namespace Console_Monolit_Game_Black_Jack.Entities
 
         public void GetReport()
         {
-            ReportGame report = new ReportGame();
-            report.NumberGame = ListReportGame.Count + 1;
+            NumberCurrentGame++;
+            ViewConsole.Clear();            
+            ViewConsole.NumberGame(NumberCurrentGame);
 
-            ViewConsole.Clear();
-            ViewConsole.NumberGame(report.NumberGame);
             foreach (User user in UserGame)
             {
+                ReportGame report = new ReportGame();
+                report.NumberGame = NumberCurrentGame;
                 report.User = user;
-                ViewConsole.ReportGame(user.Name, user.Money, user.WinLost, user.Bet, user.SumPointsCards(), user.RowNamesCards());                
-            }            
-            ListReportGame.Add(report);
-
-            ViewConsole.LineConsole();
-            ViewConsole.PressContinue();
-            Console.ReadKey();
+                ViewConsole.ReportGame(user.Name, user.Money, user.WinDrawLost, user.Bet, SumPointsCards(user), ViewConsole.RowNamesCards(GetArrayNameCards(user), GetArraySuitCards(user)));
+                ListReportGame.Add(report);
+            }
+            ViewConsole.LineInConsole();
         }
 
         public void ClearResult()
         {
-            for (int i = 0; i < UserGame.Count; i++)
+            if (UserGame[1].Cards.Count != 0 )
             {
-                if (UserGame[i].Cards.Count != 0)
+                List<User> tempUserGame = new List<User>();
+
+                for (int i = 0; i < UserGame.Count; i++)
                 {
-                    UserGame[i].Cards.RemoveRange(0, UserGame[i].Cards.Count);
-                }                
+                    tempUserGame.Add(new User { Name = UserGame[i].Name, Money = UserGame[i].Money });
+                }
+                UserGame = tempUserGame;
             }
 
             Bet = 0;
@@ -441,10 +490,8 @@ namespace Console_Monolit_Game_Black_Jack.Entities
             NextCourseComputer = false;
         }
 
-        public void ExecuteFiveGames()
+        public void ExecuteGames()
         {
-            for (int i = 0; i < (int)RestrictionsEnum.ExecuteFiveGames; i++)
-            {
                 ClearResult();
                 ViewDataUser();
                 GetBetUser(UserGame[1]);
@@ -454,7 +501,11 @@ namespace Console_Monolit_Game_Black_Jack.Entities
                 ViewDataUser();
                 GetGame();
                 GetReport();
-            }           
+            ViewConsole.PressContinue();
+            if (ViewConsole.ReadKey().ToLower() == "y")
+            {
+                ExecuteGames();
+            }
         }
 
         public void ShowAllReport()
@@ -462,16 +513,11 @@ namespace Console_Monolit_Game_Black_Jack.Entities
             ViewConsole.Clear();
             foreach (ReportGame report in ListReportGame)
             {
-                foreach (User user in UserGame)
-                {
-                    ViewConsole.NumberGame(report.NumberGame);
-                    report.User = user;
-                    ViewConsole.ReportGame(user.Name, user.Money, user.WinLost, user.Bet, user.SumPointsCards(), user.RowNamesCards());
-                }
-                ViewConsole.LineConsole();
-            }
-            ViewConsole.PressContinue();
-            Console.ReadKey();
+                ViewConsole.NumberGame(report.NumberGame);
+                ViewConsole.ReportGame(report.User.Name, report.User.Money, report.User.WinDrawLost, report.User.Bet, SumPointsCards(report.User), ViewConsole.RowNamesCards(GetArrayNameCards(report.User), GetArraySuitCards(report.User)));                
+                ViewConsole.LineInConsole();
+            }            
+            ViewConsole.ReadKey();
         }
     }
 }
