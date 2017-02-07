@@ -49,8 +49,11 @@
     <Compile Include="Entities\ReportGame.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Infrastructure\BusinessLogic.cs" />
+    <Compile Include="Infrastructure\EnumCards.cs" />
+    <Compile Include="Infrastructure\EnumSuitCards.cs" />
+    <Compile Include="Infrastructure\RestrictionsEnum.cs" />
     <Compile Include="Infrastructure\Validation.cs" />
-    <Compile Include="Infrastructure\ViewConsole.cs" />
+    <Compile Include="Infrastructure\OutputDataRepresentation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

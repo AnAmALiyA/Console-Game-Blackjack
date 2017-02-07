@@ -6,12 +6,6 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
 {
     public class Validation
     {
-        enum RestrictionsEnum
-        {
-            MinimumLimitOfMoney = 100,
-            MaximumLimitOfMoney = 400
-        }
-
         public void ExamineEnterName(User user)
         {
             string patternName = @"^[a-zA-Zа-яА-Я]+$";
@@ -23,22 +17,21 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
                 bool success = false;
                 do
                 {
-                    tempText = Console.ReadLine();
+                    tempText = OutputDataRepresentation.GetInputUser();
                     success = regexName.IsMatch(tempText);
                     if (success)
                     {
                         user.Name = tempText;
+                        break;
                     }
-                    else
-                    {
-                        ViewConsole.ErrorName();
-                        ViewConsole.EnterName();
-                    }
+                    OutputDataRepresentation.ErrorName();
+                    OutputDataRepresentation.EnterName();
+
                 } while (!success);
             }
             catch (Exception ex)
             {
-                ViewConsole.Error(ex.Message);
+                OutputDataRepresentation.Error(ex.Message);
             }
         }
 
@@ -53,31 +46,27 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
                 bool success = false;
                 do
                 {
-                    tempText = Console.ReadLine();
+                    tempText = OutputDataRepresentation.GetInputUser();
                     success = regexMoney.IsMatch(tempText);
                     if (success)
                     {
                         if (Int32.Parse(tempText) >= (int)RestrictionsEnum.MinimumLimitOfMoney & Int32.Parse(tempText) <= (int)RestrictionsEnum.MaximumLimitOfMoney)
                         {
                             user.Money = Int32.Parse(tempText);
+                            break;
                         }
-                        else
-                        {
-                            success = false;
-                            ViewConsole.ErrorMoney();
-                            ViewConsole.EnterAmountOfMoney();
-                        }
+                        success = false;
+                        OutputDataRepresentation.ErrorMoney();
+                        OutputDataRepresentation.EnterAmountOfMoney();
+                        continue;
                     }
-                    else
-                    {
-                        ViewConsole.ErrorMoney();
-                        ViewConsole.EnterAmountOfMoney();
-                    }
+                    OutputDataRepresentation.ErrorMoney();
+                    OutputDataRepresentation.EnterAmountOfMoney();
                 } while (!success);
             }
             catch (Exception ex)
             {
-                ViewConsole.Error(ex.Message);
+                OutputDataRepresentation.Error(ex.Message);
             }
         }
     }

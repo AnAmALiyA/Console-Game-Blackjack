@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Console_Monolit_Game_Black_Jack.Infrastructure
 {
-    public static class ViewConsole
+    public static class OutputDataRepresentation
     {
         static Dictionary<string, string> dictTextByGame = new Dictionary<string, string>();
-        static ViewConsole()
+        static OutputDataRepresentation()
         {
             dictTextByGame.Add("nameGame", "Black jack");
             dictTextByGame.Add("screen", "\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\tBlack jack");
@@ -164,12 +164,12 @@ namespace Console_Monolit_Game_Black_Jack.Infrastructure
             Console.Clear();
         }
 
-        public static string ReadKey()
+        public static string GetActionUser()
         {
             return Console.ReadKey().Key.ToString();
         }
 
-        public static string ReadLine()
+        public static string GetInputUser()
         {
             return Console.ReadLine();
         }

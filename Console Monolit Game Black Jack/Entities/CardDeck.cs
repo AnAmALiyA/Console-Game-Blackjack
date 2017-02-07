@@ -1,63 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using Console_Monolit_Game_Black_Jack.Infrastructure;
 
 namespace Console_Monolit_Game_Black_Jack.Entities
 {
     public class CardDeck
     {
         public List<Card> ListCards { get; set; }
-
-        enum RandomEnum
-        {
-            CountShuffle = 3
-        }
-
-        enum EnumCards
-        {
-            Two = 2,
-            Three,
-            Four,
-            Five,
-            Six,
-            Seven,
-            Eight,
-            Nine,
-            Ten,
-            Ace,
-            Jack,
-            Queen,
-            King
-        }
-
-        enum EnumSuitCards
-        {
-            Spade,
-            Heart,
-            Diamond,
-            Club
-        }
-
+        private int CountShuffle = 3;
+        
         public void CreateCardDeck()
         {
             List<Card> tempListCards = new List<Card>();
-            string[] suit = Enum.GetNames(typeof(EnumSuitCards));
-            string[] arrayNameCards = Enum.GetNames(typeof(EnumCards));            
-            int[] arrayCardsValue = (int[])Enum.GetValues(typeof(EnumCards));
-            
-            for (int i = 0; i < arrayNameCards.Length; i++)
+
+            foreach (EnumCards nameCards in Enum.GetValues(typeof(EnumCards)))
             {
-                for (int j = 0; j < suit.Length; j++)
+                foreach (EnumSuitCards nameSuitCards in Enum.GetValues(typeof(EnumSuitCards)))
                 {
-                    if (arrayNameCards[i] == EnumCards.King.ToString() | arrayNameCards[i] == EnumCards.Queen.ToString() | arrayNameCards[i] == EnumCards.Jack.ToString())
+                    if (nameCards == EnumCards.King | nameCards == EnumCards.Queen | nameCards == EnumCards.Jack)
                     {
-                        tempListCards.Add(new Card { NameCard = arrayNameCards[i], SuitCard = suit[j], ValueCard = (int)EnumCards.Ten});
+                        tempListCards.Add( new Card { NameCard = nameCards, SuitCard = nameSuitCards, ValueCard = (int)EnumCards.Ten });
+                        continue;
                     }
-                    else
-                    {
-                        tempListCards.Add(new Card { NameCard = arrayNameCards[i], SuitCard = suit[j], ValueCard = arrayCardsValue[i]});
-                    }
+                    tempListCards.Add(new Card { NameCard = nameCards, SuitCard = nameSuitCards, ValueCard = (int)nameCards });
                 }
-            }
+            }           
             ListCards = tempListCards;
         }
 
@@ -65,7 +32,7 @@ namespace Console_Monolit_Game_Black_Jack.Entities
         {
             Random rnd = new Random();
 
-            for (int j = 0; j < (int)RandomEnum.CountShuffle; j++)
+            for (int j = 0; j < CountShuffle; j++)
             {
                 for (int i = 0; i < ListCards.Count; i++)
                 {
